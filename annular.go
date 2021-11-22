@@ -52,6 +52,8 @@ func Run(w io.Writer) {
 	// randomize parameters
 	radialCenter := rand.Float64() * maxRadialCenter * float64(width) //px
 	cx, cy := rand.Float64()*float64(width), rand.Float64()*float64(height)
+	maxMaxArcLength := rand.Float64() * maxArcLength
+	maxMaxRadialLength := rand.Float64() * maxRadialLength
 	stype := rand.Intn(4)
 	n := rand.Intn(maxN)
 
@@ -61,8 +63,8 @@ func Run(w io.Writer) {
 		arcStart := math.Mod(rand.Float64()*360.0/180.0*math.Pi, 2*math.Pi)
 		radialStart := radialCenter + rand.Float64()*(math.Sqrt(2)*float64(width))
 
-		radialLength := radialLength(radialStart, maxRadialLength*float64(width), arcStart, stype) //px
-		arcLength := arcLength(arcStart, maxArcLength*float64(width), radialStart, stype)
+		radialLength := radialLength(radialStart, maxMaxRadialLength*float64(width), arcStart, stype) //px
+		arcLength := arcLength(arcStart, maxMaxArcLength*float64(width), radialStart, stype)
 
 		arcEnd := math.Mod(arcStart+arcLength/180.0*math.Pi, 2*math.Pi)
 		radialEnd := radialStart + radialLength
