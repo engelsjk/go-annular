@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	goannular "github.com/engelsjk/go-annular"
@@ -15,4 +16,6 @@ func main() {
 	defer f.Close()
 
 	goannular.Run(f)
+
+	fmt.Println("annular.svg saved")
 }
