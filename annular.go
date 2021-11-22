@@ -61,7 +61,7 @@ func Run(w io.Writer) {
 		arcStart := math.Mod(rand.Float64()*360.0/180.0*math.Pi, 2*math.Pi)
 		radialStart := radial_center + rand.Float64()*(math.Sqrt(2)*float64(width))
 
-		radialLength := radialLength(radialStart, maxRadialCenter*float64(width), arcStart, stype) //px
+		radialLength := radialLength(radialStart, maxRadialLength*float64(width), arcStart, stype) //px
 		arcLength := arcLength(arcStart, maxArcLength*float64(width), radialStart, stype)
 
 		arc_end := math.Mod(arcStart+arcLength/180.0*math.Pi, 2*math.Pi)

@@ -30,13 +30,13 @@ func (a Annulus) ellipticalArcCurve(inorout string) string {
 	var angle, sweepflag int
 	var rx, ry, x, y float64
 
-	arc_length := a.end - a.start
+	arcLength := a.end - a.start
 
-	arc := math.Mod(arc_length, 2*math.Pi)
+	arc := math.Mod(arcLength, 2*math.Pi)
 
-	large_arc := 0
+	largeArc := 0
 	if arc > math.Pi {
-		large_arc = 1
+		largeArc = 1
 	}
 
 	switch inorout {
@@ -61,7 +61,7 @@ func (a Annulus) ellipticalArcCurve(inorout string) string {
 		strconv.FormatFloat(rx, 'f', -1, 64),
 		strconv.FormatFloat(ry, 'f', -1, 64),
 		strconv.Itoa(angle),
-		strconv.Itoa(large_arc),
+		strconv.Itoa(largeArc),
 		strconv.Itoa(sweepflag),
 		strconv.FormatFloat(x, 'f', -1, 64),
 		strconv.FormatFloat(y, 'f', -1, 64),
@@ -86,71 +86,65 @@ func (a Annulus) path() string {
 
 	var d strings.Builder
 
-	move_to := a.moveTo()
-	eac_outer := a.ellipticalArcCurve("outer")
-	line_to := a.lineTo()
-	eac_inner := a.ellipticalArcCurve("inner")
-	close_path := "z"
+	d.WriteString(a.moveTo())
+	d.WriteString(a.ellipticalArcCurve("outer"))
+	d.WriteString(a.lineTo())
+	d.WriteString(a.ellipticalArcCurve("inner"))
+	d.WriteString("z")
 
-	d.WriteString(move_to)
-	d.WriteString(eac_outer)
-	d.WriteString(line_to)
-	d.WriteString(eac_inner)
-	d.WriteString(close_path)
-
-	return (d.String())
+	return d.String()
 }
 
-func radialLength(radial_start, radial_length_base, arc_start float64, stype int) float64 {
+func radialLength(radialStart, maxRadialLength, arcStart float64, stype int) float64 {
 
-	adj_radius_limits := []float64{250.0, 500.0}
-	var radial_length float64
+	adjRadiusLimits := []float64{250.0, 500.0}
+	var radialLength float64
 
 	switch stype {
 	case 0:
-		radial_length = rand.Float64() * radial_length_base //px
+		radialLength = rand.Float64() * maxRadialLength //px
 	case 1:
 		switch {
-		case radial_start < adj_radius_limits[0]:
-			radial_length = rand.Float64() * radial_length_base / 3.0 //px
-		case radial_start >= adj_radius_limits[0] && radial_start < adj_radius_limits[1]:
-			radial_length = rand.Float64() * radial_length_base / 2.0 //px
-		case radial_start >= adj_radius_limits[1]:
-			radial_length = rand.Float64() * radial_length_base / 1.0 //px
+		case radialStart < adjRadiusLimits[0]:
+			radialLength = rand.Float64() * maxRadialLength / 3.0 //px
+		case radialStart >= adjRadiusLimits[0] && radialStart < adjRadiusLimits[1]:
+			radialLength = rand.Float64() * maxRadialLength / 2.0 //px
+		case radialStart >= adjRadiusLimits[1]:
+			radialLength = rand.Float64() * maxRadialLength / 1.0 //px
 		}
 	case 2:
-		radial_length = rand.Float64() * radial_length_base
+		radialLength = rand.Float64() * maxRadialLength
 	case 3:
-		radial_length_base = rand.Float64() * radial_length_base
-		radial_length = rand.Float64() * radial_length_base
+		maxRadialLength = rand.Float64() * maxRadialLength
+		radialLength = rand.Float64() * maxRadialLength
 	}
 
-	return (radial_length)
+	return radialLength
 }
 
-func arcLength(arc_start, arc_length_base, radial_start float64, stype int) float64 {
+func arcLength(arcStart, maxArcLength, radialStart float64, stype int) float64 {
 
-	adj_radius_limits := []float64{250.0, 500.0}
-	var arc_length float64
+	adjRadiusLimits := []float64{250.0, 500.0}
+	var arcLength float64
 
 	switch stype {
 	case 0:
-		arc_length = rand.Float64() * 1.0 //px
+		arcLength = rand.Float64() * 1.0 //px
 	case 1:
 		switch {
-		case radial_start < adj_radius_limits[0]:
-			arc_length = rand.Float64() * arc_length_base / 3.0 //px
-		case radial_start >= adj_radius_limits[0] && radial_start < adj_radius_limits[1]:
-			arc_length = rand.Float64() * arc_length_base / 2.0 //px
-		case radial_start >= adj_radius_limits[1]:
-			arc_length = rand.Float64() * arc_length_base / 1.0 //px
+		case radialStart < adjRadiusLimits[0]:
+			arcLength = rand.Float64() * maxArcLength / 3.0 //px
+		case radialStart >= adjRadiusLimits[0] && radialStart < adjRadiusLimits[1]:
+			arcLength = rand.Float64() * maxArcLength / 2.0 //px
+		case radialStart >= adjRadiusLimits[1]:
+			arcLength = rand.Float64() * maxArcLength / 1.0 //px
 		}
 	case 2:
-		arc_length = rand.Float64() * arc_length_base
+		arcLength = rand.Float64() * maxArcLength
 	case 3:
-		arc_length_base = rand.Float64() * arc_length_base
-		arc_length = rand.Float64() * arc_length_base
+		maxArcLength = rand.Float64() * maxArcLength
+		arcLength = rand.Float64() * maxArcLength
 	}
 
-	return (arc_length)
+	return arcLength
 }
