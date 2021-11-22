@@ -3,26 +3,30 @@ package goannular
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math/rand"
 	"os"
 )
 
 type Colors struct {
-	Palettes [][]string `json:"palettes"`
+	palettes [][]string `json:"palettes"`
 }
 
-func loadColorPalettes(filename string) (*Colors, error) {
+func (c Colors) Load(filename string) error {
 
-	var colors Colors
 	f, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer f.Close()
 
 	byteValue, _ := ioutil.ReadAll(f)
-	err = json.Unmarshal(byteValue, &colors)
+	err = json.Unmarshal(byteValue, &c.palettes)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &colors, nil
+	return nil
+}
+
+func (c Colors) RandomPalette() {
+	c.palettes[rand.Intn(len(c.palettes))]
 }

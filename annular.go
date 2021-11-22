@@ -31,11 +31,12 @@ func Run(w io.Writer) {
 	rand.Seed(seed) // initialize global pseudo random generator
 
 	// colors
-	colors, err := loadColorPalettes(palettesFilename)
+	var colors Colors
+	err := colors.Load(palettesFilename)
 	if err != nil {
 		panic(err)
 	}
-	palette := colors.Palettes[rand.Intn(len(colors.Palettes))]
+	palette := colors.
 
 	// title
 	title := strconv.FormatInt(seed, 10)
