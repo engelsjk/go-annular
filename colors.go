@@ -2,7 +2,6 @@ package goannular
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -11,22 +10,19 @@ type Colors struct {
 	Palettes [][]string `json:"palettes"`
 }
 
-func loadColorPalettes(filename string) Colors {
+func loadColorPalettes(filename string) (*Colors, error) {
 
 	var colors Colors
-	jsonFile, err := os.Open(filename)
-	if verbose {
-		if err != nil {
-			fmt.Println(err)
-		}
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
 	}
-	defer jsonFile.Close()
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	defer f.Close()
+
+	byteValue, _ := ioutil.ReadAll(f)
 	err = json.Unmarshal(byteValue, &colors)
-	if verbose {
-		if err != nil {
-			fmt.Println(err)
-		}
+	if err != nil {
+		return nil, err
 	}
-	return (colors)
+	return &colors, nil
 }

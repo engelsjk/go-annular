@@ -12,7 +12,7 @@ import (
 func main() {
 	http.Handle("/", http.HandlerFunc(handler))
 	port := "2003"
-	fmt.Printf("deep @ http://localhost:%s\n", port)
+	fmt.Printf("listening at http://localhost:%s\n", port)
 	err := http.ListenAndServe(net.JoinHostPort("", port), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)

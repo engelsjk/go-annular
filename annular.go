@@ -22,32 +22,38 @@ var (
 	radial_length_base = 50.0
 	n_base             = 15000
 	palettesFilename   = "palettes.json"
-	verbose            = false
 )
 
 func Run(w io.Writer) {
 
-	s := svg.New(w)
-
+	// seed
 	seed := time.Now().Unix()
+	seed = 1560532121
 	rand.Seed(seed) // initialize global pseudo random generator
 
-	title := strconv.FormatInt(seed, 10)
-	s.Title(title)
-
-	colors := loadColorPalettes(palettesFilename)
+	// colors
+	colors, err := loadColorPalettes(palettesFilename)
+	if err != nil {
+		panic(err)
+	}
 	palette := colors.Palettes[rand.Intn(len(colors.Palettes))]
 
+	// title
+	title := strconv.FormatInt(seed, 10)
+
+	// init svg
+	s := svg.New(w)
 	s.Start(width, height)
+	s.Title(title)
 	s.Rect(0, 0, width, height, s.RGB(0, 0, 0))
 
+	// randomize parameters
 	radial_center := rand.Float64() * radial_center_base //px
 	cx, cy := rand.Float64()*float64(width), rand.Float64()*float64(height)
-
 	stype := rand.Intn(4)
-
 	n := rand.Intn(n_base)
 
+	// annuli
 	for i := 0; i < n; i++ {
 
 		arc_start := math.Mod(rand.Float64()*360.0/180.0*math.Pi, 2*math.Pi)
@@ -67,5 +73,6 @@ func Run(w io.Writer) {
 		s.Path(path, fill)
 	}
 
+	// end
 	s.End()
 }
