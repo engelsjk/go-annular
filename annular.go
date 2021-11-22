@@ -36,7 +36,7 @@ func Run(w io.Writer) {
 	if err != nil {
 		panic(err)
 	}
-	palette := colors.
+	colors.SetRandomPalette()
 
 	// title
 	title := strconv.FormatInt(seed, 10)
@@ -45,7 +45,9 @@ func Run(w io.Writer) {
 	s := svg.New(w)
 	s.Start(width, height)
 	s.Title(title)
-	s.Rect(0, 0, width, height, s.RGB(0, 0, 0))
+
+	fill := fmt.Sprintf("fill:%s", colors.RandomColorOrBlack())
+	s.Rect(0, 0, width, height, fill)
 
 	// randomize parameters
 	radial_center := rand.Float64() * maxRadialCenter * float64(width) //px
@@ -68,7 +70,7 @@ func Run(w io.Writer) {
 		annulus := Annulus{x: cx, y: cy, start: arcStart, end: arc_end, inner: radialStart, outer: radial_end}
 
 		path := annulus.path()
-		fill := fmt.Sprintf("fill:%s", palette[rand.Intn(len(palette))])
+		fill := fmt.Sprintf("fill:%s", colors.RandomColor())
 
 		s.Path(path, fill)
 	}

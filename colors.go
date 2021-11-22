@@ -8,10 +8,13 @@ import (
 )
 
 type Colors struct {
-	palettes [][]string `json:"palettes"`
+	palette            []string
+	numColorsInPalette int
+	palettes           [][]string
+	numPalettes        int
 }
 
-func (c Colors) Load(filename string) error {
+func (c *Colors) Load(filename string) error {
 
 	f, err := os.Open(filename)
 	if err != nil {
@@ -19,14 +22,35 @@ func (c Colors) Load(filename string) error {
 	}
 	defer f.Close()
 
+	var palettes [][]string
+
 	byteValue, _ := ioutil.ReadAll(f)
-	err = json.Unmarshal(byteValue, &c.palettes)
+	err = json.Unmarshal(byteValue, &palettes)
 	if err != nil {
 		return err
 	}
+
+	c.palettes = palettes
+	c.numPalettes = len(c.palettes)
 	return nil
 }
 
-func (c Colors) RandomPalette() {
-	c.palettes[rand.Intn(len(c.palettes))]
+func (c *Colors) SetRandomPalette() {
+	c.palette = c.palettes[rand.Intn(c.numPalettes)]
+	c.numColorsInPalette = len(c.palette)
+}
+
+func (c *Colors) RandomColor() string {
+	if c.palette == nil {
+		c.SetRandomPalette()
+	}
+	return c.palette[rand.Intn(c.numColorsInPalette)]
+}
+
+func (c *Colors) RandomColorOrBlack() string {
+	if c.palette == nil {
+		c.SetRandomPalette()
+	}
+	palette := append(c.palette, "#000000")
+	return palette[rand.Intn(c.numColorsInPalette+1)]
 }
