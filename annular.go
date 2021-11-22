@@ -50,7 +50,7 @@ func Run(w io.Writer) {
 	s.Rect(0, 0, width, height, fill)
 
 	// randomize parameters
-	radial_center := rand.Float64() * maxRadialCenter * float64(width) //px
+	radialCenter := rand.Float64() * maxRadialCenter * float64(width) //px
 	cx, cy := rand.Float64()*float64(width), rand.Float64()*float64(height)
 	stype := rand.Intn(4)
 	n := rand.Intn(maxN)
@@ -59,15 +59,15 @@ func Run(w io.Writer) {
 	for i := 0; i < n; i++ {
 
 		arcStart := math.Mod(rand.Float64()*360.0/180.0*math.Pi, 2*math.Pi)
-		radialStart := radial_center + rand.Float64()*(math.Sqrt(2)*float64(width))
+		radialStart := radialCenter + rand.Float64()*(math.Sqrt(2)*float64(width))
 
 		radialLength := radialLength(radialStart, maxRadialLength*float64(width), arcStart, stype) //px
 		arcLength := arcLength(arcStart, maxArcLength*float64(width), radialStart, stype)
 
-		arc_end := math.Mod(arcStart+arcLength/180.0*math.Pi, 2*math.Pi)
-		radial_end := radialStart + radialLength
+		arcEnd := math.Mod(arcStart+arcLength/180.0*math.Pi, 2*math.Pi)
+		radialEnd := radialStart + radialLength
 
-		annulus := Annulus{x: cx, y: cy, start: arcStart, end: arc_end, inner: radialStart, outer: radial_end}
+		annulus := Annulus{x: cx, y: cy, start: arcStart, end: arcEnd, inner: radialStart, outer: radialEnd}
 
 		path := annulus.path()
 		fill := fmt.Sprintf("fill:%s", colors.RandomColor())

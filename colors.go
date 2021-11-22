@@ -24,7 +24,7 @@ func (c *Colors) Load(filename string) error {
 
 	var palettes [][]string
 
-	byteValue, _ := ioutil.ReadAll(f)
+	byteValue, err := ioutil.ReadAll(f)
 	err = json.Unmarshal(byteValue, &palettes)
 	if err != nil {
 		return err
