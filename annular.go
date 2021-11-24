@@ -38,7 +38,7 @@ type Annular struct {
 	ctx             *canvas.Context
 }
 
-func NewAnnular() (*Annular, error) {
+func NewAnnular() *Annular {
 
 	a := &Annular{
 		width:           width,
@@ -56,7 +56,7 @@ func NewAnnular() (*Annular, error) {
 
 	a.colors = &Colors{palettes: palettes, numPalettes: len(palettes)}
 
-	return a, nil
+	return a
 }
 
 func (a *Annular) Draw() {

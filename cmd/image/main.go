@@ -16,10 +16,7 @@ func main() {
 	}
 	defer f.Close()
 
-	annular, err := goannular.NewAnnular()
-	if err != nil {
-		panic(err)
-	}
+	annular := goannular.NewAnnular()
 
 	annular.Draw()
 	if err := annular.Render(f, "svg"); err != nil {

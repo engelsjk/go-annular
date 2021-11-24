@@ -31,10 +31,7 @@ func (h *Handler) PNG(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 
-	annular, err := goannular.NewAnnular()
-	if err != nil {
-		panic(err)
-	}
+	annular := goannular.NewAnnular()
 
 	handler := &Handler{annular: annular}
 
@@ -44,7 +41,7 @@ func main() {
 	port := "2003"
 
 	fmt.Printf("listening at http://localhost:%s/svg and listening at http://localhost:%s/png\n", port)
-	err = http.ListenAndServe(net.JoinHostPort("", port), nil)
+	err := http.ListenAndServe(net.JoinHostPort("", port), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
