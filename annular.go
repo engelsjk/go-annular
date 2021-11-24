@@ -15,16 +15,6 @@ import (
 	"github.com/tdewolff/canvas/renderers"
 )
 
-var (
-	width            = 1000.0
-	height           = 1000.0
-	maxRadialCenter  = 0.10
-	maxArcLength     = 0.05
-	maxRadialLength  = 0.05
-	maxN             = 15000
-	filenamePalettes = "palettes.json"
-)
-
 type Annular struct {
 	title           string
 	width           float64
@@ -38,15 +28,42 @@ type Annular struct {
 	ctx             *canvas.Context
 }
 
-func NewAnnular() *Annular {
+type AnnularOption func(*Annular)
+
+func WithWidth(width float64) AnnularOption {
+	return func(a *Annular) {
+		a.width = width
+	}
+}
+
+func WithHeight(height float64) AnnularOption {
+	return func(a *Annular) {
+		a.height = height
+	}
+}
+
+func NewAnnular(opts ...AnnularOption) *Annular {
+
+	const (
+		defaultWidth           = 1000.0
+		defaultHeight          = 1000.0
+		defaultMaxRadialCenter = 0.10
+		defaultMaxArcLength    = 0.05
+		defaultMaxRadialLength = 0.05
+		defaultMaxN            = 15000
+	)
 
 	a := &Annular{
-		width:           width,
-		height:          height,
-		maxRadialCenter: maxRadialCenter,
-		maxArcLength:    maxArcLength,
-		maxRadialLength: maxRadialLength,
-		maxN:            maxN,
+		width:           defaultWidth,
+		height:          defaultHeight,
+		maxRadialCenter: defaultMaxRadialCenter,
+		maxArcLength:    defaultMaxArcLength,
+		maxRadialLength: defaultMaxRadialLength,
+		maxN:            defaultMaxN,
+	}
+
+	for _, opt := range opts {
+		opt(a)
 	}
 
 	seed := time.Now().Unix()
@@ -63,7 +80,7 @@ func (a *Annular) Draw() {
 
 	a.colors.SetRandomPalette()
 
-	a.canvas = canvas.New(width, height)
+	a.canvas = canvas.New(a.width, a.height)
 	a.ctx = canvas.NewContext(a.canvas)
 
 	a.ctx.SetFillColor(a.colors.RandomColorOrBlackRGBA())
@@ -81,7 +98,7 @@ func (a *Annular) Draw() {
 	for i := 0; i < n; i++ {
 
 		arcStart := math.Mod(rand.Float64()*360.0/180.0*math.Pi, 2*math.Pi)
-		radialStart := radialCenter + rand.Float64()*(math.Sqrt(2)*float64(width))
+		radialStart := radialCenter + rand.Float64()*(math.Sqrt(2)*float64(a.width))
 
 		radialLength := radialLength(radialStart, maxMaxRadialLength*float64(a.width), arcStart, stype) //px
 		arcLength := arcLength(arcStart, maxMaxArcLength*float64(a.width), radialStart, stype)
