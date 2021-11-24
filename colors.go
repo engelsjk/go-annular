@@ -1,42 +1,17 @@
 package goannular
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"image/color"
-	"io/ioutil"
 	"math/rand"
-	"os"
 )
 
 type Colors struct {
-	fn                 string
 	palette            []string
 	numColorsInPalette int
 	palettes           [][]string
 	numPalettes        int
-}
-
-func (c *Colors) Load() error {
-
-	f, err := os.Open(c.fn)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	var palettes [][]string
-
-	byteValue, err := ioutil.ReadAll(f)
-	err = json.Unmarshal(byteValue, &palettes)
-	if err != nil {
-		return err
-	}
-
-	c.palettes = palettes
-	c.numPalettes = len(c.palettes)
-	return nil
 }
 
 func (c *Colors) SetRandomPalette() {

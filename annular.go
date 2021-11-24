@@ -26,17 +26,16 @@ var (
 )
 
 type Annular struct {
-	title            string
-	width            float64
-	height           float64
-	maxRadialCenter  float64
-	maxArcLength     float64
-	maxRadialLength  float64
-	maxN             int
-	filenamePalettes string
-	colors           *Colors
-	canvas           *canvas.Canvas
-	ctx              *canvas.Context
+	title           string
+	width           float64
+	height          float64
+	maxRadialCenter float64
+	maxArcLength    float64
+	maxRadialLength float64
+	maxN            int
+	colors          *Colors
+	canvas          *canvas.Canvas
+	ctx             *canvas.Context
 }
 
 func NewAnnular() (*Annular, error) {
@@ -50,31 +49,19 @@ func NewAnnular() (*Annular, error) {
 		maxN:            maxN,
 	}
 
-	a.colors = &Colors{fn: filenamePalettes}
-
-	err := a.LoadColorPalettes()
-	if err != nil {
-		return nil, err
-	}
-
-	return a, nil
-}
-
-func (a *Annular) LoadColorPalettes() error {
-	err := a.colors.Load()
-	if err != nil {
-		return err
-	}
-	a.colors.SetRandomPalette()
-	return nil
-}
-
-func (a *Annular) Draw() {
-
 	seed := time.Now().Unix()
 	a.title = strconv.FormatInt(seed, 10)
 
 	rand.Seed(seed)
+
+	a.colors = &Colors{palettes: palettes, numPalettes: len(palettes)}
+
+	return a, nil
+}
+
+func (a *Annular) Draw() {
+
+	a.colors.SetRandomPalette()
 
 	a.canvas = canvas.New(width, height)
 	a.ctx = canvas.NewContext(a.canvas)
