@@ -43,7 +43,7 @@ func main() {
 
 	port := "2003"
 
-	fmt.Printf("listening at http://localhost:%s\n", port)
+	fmt.Printf("listening at http://localhost:%s/svg and listening at http://localhost:%s/png\n", port)
 	err = http.ListenAndServe(net.JoinHostPort("", port), nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err)
