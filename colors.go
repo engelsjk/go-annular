@@ -11,15 +11,16 @@ import (
 )
 
 type Colors struct {
+	fn                 string
 	palette            []string
 	numColorsInPalette int
 	palettes           [][]string
 	numPalettes        int
 }
 
-func (c *Colors) Load(filename string) error {
+func (c *Colors) Load() error {
 
-	f, err := os.Open(filename)
+	f, err := os.Open(c.fn)
 	if err != nil {
 		return err
 	}
@@ -50,7 +51,7 @@ func (c *Colors) RandomColorHex() string {
 	return c.palette[rand.Intn(c.numColorsInPalette)]
 }
 
-func (c *Colors) RandomColor() color.RGBA {
+func (c *Colors) RandomColorRGBA() color.RGBA {
 	h := c.RandomColorHex()
 	rgba, err := parseHexColorFast(h)
 	if err != nil {
@@ -67,7 +68,7 @@ func (c *Colors) RandomColorOrBlackHex() string {
 	return palette[rand.Intn(c.numColorsInPalette+1)]
 }
 
-func (c *Colors) RandomColorOrBlack() color.RGBA {
+func (c *Colors) RandomColorOrBlackRGBA() color.RGBA {
 	h := c.RandomColorOrBlackHex()
 	rgba, err := parseHexColorFast(h)
 	if err != nil {
@@ -77,9 +78,10 @@ func (c *Colors) RandomColorOrBlack() color.RGBA {
 }
 
 // https://stackoverflow.com/questions/54197913/parse-hex-string-to-image-color
-var errInvalidFormat = errors.New("invalid format")
-
 func parseHexColorFast(s string) (c color.RGBA, err error) {
+
+	var errInvalidFormat = errors.New("invalid format")
+
 	c.A = 0xff
 
 	if s[0] != '#' {

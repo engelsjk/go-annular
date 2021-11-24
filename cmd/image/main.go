@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	goannular "github.com/engelsjk/go-annular"
@@ -15,7 +16,15 @@ func main() {
 	}
 	defer f.Close()
 
-	goannular.Run(f)
+	annular, err := goannular.NewAnnular()
+	if err != nil {
+		panic(err)
+	}
+
+	annular.Draw()
+	if err := annular.Render(f, "svg"); err != nil {
+		log.Println(err.Error())
+	}
 
 	fmt.Println("annular.svg saved")
 }

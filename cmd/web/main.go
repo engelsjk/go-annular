@@ -9,22 +9,43 @@ import (
 	goannular "github.com/engelsjk/go-annular"
 )
 
-func main() {
-	http.Handle("/", http.HandlerFunc(handlerSVG))
-	port := "2003"
-	fmt.Printf("listening at http://localhost:%s\n", port)
-	err := http.ListenAndServe(net.JoinHostPort("", port), nil)
-	if err != nil {
-		log.Fatal("ListenAndServe:", err)
+type Handler struct {
+	annular *goannular.Annular
+}
+
+func (h *Handler) SVG(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "image/svg+xml")
+	h.annular.Draw()
+	if err := h.annular.Render(w, "svg"); err != nil {
+		log.Println(err.Error())
 	}
 }
 
-func handlerSVG(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "image/svg+xml")
-	goannular.Run(w)
+func (h *Handler) PNG(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "image/png")
+	h.annular.Draw()
+	if err := h.annular.Render(w, "png"); err != nil {
+		log.Println(err.Error())
+	}
 }
 
-func handlerPNG(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("Content-Type", "image/png")
-	goannular.Run(w)
+func main() {
+
+	annular, err := goannular.NewAnnular()
+	if err != nil {
+		panic(err)
+	}
+
+	handler := &Handler{annular: annular}
+
+	http.Handle("/png", http.HandlerFunc(handler.PNG))
+	http.Handle("/svg", http.HandlerFunc(handler.SVG))
+
+	port := "2003"
+
+	fmt.Printf("listening at http://localhost:%s\n", port)
+	err = http.ListenAndServe(net.JoinHostPort("", port), nil)
+	if err != nil {
+		log.Fatal("ListenAndServe:", err)
+	}
 }

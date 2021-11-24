@@ -4,9 +4,11 @@ package goannular
 // https://stackoverflow.com/questions/11479185/svg-donut-slice-as-path-element-annular-sector
 
 import (
+	"fmt"
 	"io"
 	"math"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/tdewolff/canvas"
@@ -20,40 +22,73 @@ var (
 	maxArcLength     = 0.05
 	maxRadialLength  = 0.05
 	maxN             = 15000
-	palettesFilename = "palettes.json"
+	filenamePalettes = "palettes.json"
 )
 
-func Run(w io.Writer) {
+type Annular struct {
+	title            string
+	width            float64
+	height           float64
+	maxRadialCenter  float64
+	maxArcLength     float64
+	maxRadialLength  float64
+	maxN             int
+	filenamePalettes string
+	colors           *Colors
+	canvas           *canvas.Canvas
+	ctx              *canvas.Context
+}
 
-	// seed
-	seed := time.Now().Unix()
-	rand.Seed(seed) // initialize global pseudo random generator
+func NewAnnular() (*Annular, error) {
 
-	// colors
-	var colors Colors
-	err := colors.Load(palettesFilename)
-	if err != nil {
-		panic(err)
+	a := &Annular{
+		width:           width,
+		height:          height,
+		maxRadialCenter: maxRadialCenter,
+		maxArcLength:    maxArcLength,
+		maxRadialLength: maxRadialLength,
+		maxN:            maxN,
 	}
-	colors.SetRandomPalette()
 
-	// title
-	// title := strconv.FormatInt(seed, 10)
+	a.colors = &Colors{fn: filenamePalettes}
 
-	// init svg
-	c := canvas.New(width, height)
-	ctx := canvas.NewContext(c)
+	err := a.LoadColorPalettes()
+	if err != nil {
+		return nil, err
+	}
 
-	ctx.SetFillColor(colors.RandomColorOrBlack())
-	ctx.DrawPath(0, 0, canvas.Rectangle(c.W, c.H))
+	return a, nil
+}
+
+func (a *Annular) LoadColorPalettes() error {
+	err := a.colors.Load()
+	if err != nil {
+		return err
+	}
+	a.colors.SetRandomPalette()
+	return nil
+}
+
+func (a *Annular) Draw() {
+
+	seed := time.Now().Unix()
+	a.title = strconv.FormatInt(seed, 10)
+
+	rand.Seed(seed)
+
+	a.canvas = canvas.New(width, height)
+	a.ctx = canvas.NewContext(a.canvas)
+
+	a.ctx.SetFillColor(a.colors.RandomColorOrBlackRGBA())
+	a.ctx.DrawPath(0, 0, canvas.Rectangle(a.canvas.W, a.canvas.H))
 
 	// randomize parameters
-	radialCenter := rand.Float64() * maxRadialCenter * float64(width) //px
-	cx, cy := rand.Float64()*float64(width), rand.Float64()*float64(height)
-	maxMaxArcLength := rand.Float64() * maxArcLength
-	maxMaxRadialLength := rand.Float64() * maxRadialLength
+	radialCenter := rand.Float64() * a.maxRadialCenter * float64(a.width) //px
+	cx, cy := rand.Float64()*float64(a.width), rand.Float64()*float64(a.height)
+	maxMaxArcLength := rand.Float64() * a.maxArcLength
+	maxMaxRadialLength := rand.Float64() * a.maxRadialLength
 	stype := rand.Intn(4)
-	n := rand.Intn(maxN)
+	n := rand.Intn(a.maxN)
 
 	// annuli
 	for i := 0; i < n; i++ {
@@ -61,8 +96,8 @@ func Run(w io.Writer) {
 		arcStart := math.Mod(rand.Float64()*360.0/180.0*math.Pi, 2*math.Pi)
 		radialStart := radialCenter + rand.Float64()*(math.Sqrt(2)*float64(width))
 
-		radialLength := radialLength(radialStart, maxMaxRadialLength*float64(width), arcStart, stype) //px
-		arcLength := arcLength(arcStart, maxMaxArcLength*float64(width), radialStart, stype)
+		radialLength := radialLength(radialStart, maxMaxRadialLength*float64(a.width), arcStart, stype) //px
+		arcLength := arcLength(arcStart, maxMaxArcLength*float64(a.width), radialStart, stype)
 
 		arcEnd := math.Mod(arcStart+arcLength/180.0*math.Pi, 2*math.Pi)
 		radialEnd := radialStart + radialLength
@@ -70,12 +105,37 @@ func Run(w io.Writer) {
 		annulus := Annulus{x: cx, y: cy, start: arcStart, end: arcEnd, inner: radialStart, outer: radialEnd}
 
 		svg := annulus.SVG()
-
 		path := canvas.MustParseSVG(svg)
-		ctx.SetFillColor(colors.RandomColor())
-		ctx.DrawPath(0, 0, path)
+		a.ctx.SetFillColor(a.colors.RandomColorRGBA())
+		a.ctx.DrawPath(0, 0, path)
 	}
 
-	cw := renderers.SVG()
-	cw(w, c)
+}
+
+func (a *Annular) SVG(w io.Writer) error {
+	return a.Render(w, "svg")
+}
+
+func (a *Annular) PNG(w io.Writer) error {
+	return a.Render(w, "png")
+}
+
+func (a *Annular) Render(w io.Writer, format string) error {
+
+	if a.canvas == nil {
+		return fmt.Errorf("no canvas drawn yet")
+	}
+
+	switch format {
+	case "png":
+		cw := renderers.PNG()
+		cw(w, a.canvas)
+		return nil
+	case "svg":
+		cw := renderers.SVG()
+		cw(w, a.canvas)
+		return nil
+	default:
+		return fmt.Errorf("format not recognized")
+	}
 }
