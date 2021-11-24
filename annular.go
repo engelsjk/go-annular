@@ -4,19 +4,18 @@ package goannular
 // https://stackoverflow.com/questions/11479185/svg-donut-slice-as-path-element-annular-sector
 
 import (
-	"fmt"
 	"io"
 	"math"
 	"math/rand"
-	"strconv"
 	"time"
 
-	svg "github.com/ajstarks/svgo"
+	"github.com/tdewolff/canvas"
+	"github.com/tdewolff/canvas/renderers"
 )
 
 var (
-	width            = 1000
-	height           = 1000
+	width            = 1000.0
+	height           = 1000.0
 	maxRadialCenter  = 0.10
 	maxArcLength     = 0.05
 	maxRadialLength  = 0.05
@@ -39,15 +38,14 @@ func Run(w io.Writer) {
 	colors.SetRandomPalette()
 
 	// title
-	title := strconv.FormatInt(seed, 10)
+	// title := strconv.FormatInt(seed, 10)
 
 	// init svg
-	s := svg.New(w)
-	s.Start(width, height)
-	s.Title(title)
+	c := canvas.New(width, height)
+	ctx := canvas.NewContext(c)
 
-	fill := fmt.Sprintf("fill:%s", colors.RandomColorOrBlack())
-	s.Rect(0, 0, width, height, fill)
+	ctx.SetFillColor(colors.RandomColorOrBlack())
+	ctx.DrawPath(0, 0, canvas.Rectangle(c.W, c.H))
 
 	// randomize parameters
 	radialCenter := rand.Float64() * maxRadialCenter * float64(width) //px
@@ -71,12 +69,13 @@ func Run(w io.Writer) {
 
 		annulus := Annulus{x: cx, y: cy, start: arcStart, end: arcEnd, inner: radialStart, outer: radialEnd}
 
-		path := annulus.path()
-		fill := fmt.Sprintf("fill:%s", colors.RandomColor())
+		svg := annulus.SVG()
 
-		s.Path(path, fill)
+		path := canvas.MustParseSVG(svg)
+		ctx.SetFillColor(colors.RandomColor())
+		ctx.DrawPath(0, 0, path)
 	}
 
-	// end
-	s.End()
+	cw := renderers.SVG()
+	cw(w, c)
 }

@@ -82,7 +82,7 @@ func (a Annulus) lineTo() string {
 	return (lt)
 }
 
-func (a Annulus) path() string {
+func (a Annulus) SVG() string {
 
 	var d strings.Builder
 

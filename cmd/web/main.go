@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	http.Handle("/", http.HandlerFunc(handler))
+	http.Handle("/", http.HandlerFunc(handlerSVG))
 	port := "2003"
 	fmt.Printf("listening at http://localhost:%s\n", port)
 	err := http.ListenAndServe(net.JoinHostPort("", port), nil)
@@ -19,7 +19,12 @@ func main() {
 	}
 }
 
-func handler(w http.ResponseWriter, req *http.Request) {
+func handlerSVG(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "image/svg+xml")
+	goannular.Run(w)
+}
+
+func handlerPNG(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "image/png")
 	goannular.Run(w)
 }
