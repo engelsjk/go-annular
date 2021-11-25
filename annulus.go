@@ -101,9 +101,9 @@ func radialLength(radialStart, maxRadialLength, arcStart float64, stype int) flo
 	var radialLength float64
 
 	switch stype {
-	case 0:
+	case 0: // starburst
 		radialLength = rand.Float64() * maxRadialLength //px
-	case 1:
+	case 1: // ???
 		switch {
 		case radialStart < adjRadiusLimits[0]:
 			radialLength = rand.Float64() * maxRadialLength / 3.0 //px

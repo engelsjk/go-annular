@@ -1,8 +1,5 @@
 package goannular
 
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
-// https://stackoverflow.com/questions/11479185/svg-donut-slice-as-path-element-annular-sector
-
 import (
 	"fmt"
 	"io"
@@ -100,13 +97,31 @@ func (a *Annular) Draw() {
 		arcStart := math.Mod(rand.Float64()*360.0/180.0*math.Pi, 2*math.Pi)
 		radialStart := radialCenter + rand.Float64()*(math.Sqrt(2)*float64(a.width))
 
-		radialLength := radialLength(radialStart, maxMaxRadialLength*float64(a.width), arcStart, stype) //px
-		arcLength := arcLength(arcStart, maxMaxArcLength*float64(a.width), radialStart, stype)
+		radialLength := radialLength(
+			radialStart,
+			maxMaxRadialLength*float64(a.width),
+			arcStart,
+			stype,
+		)
+
+		arcLength := arcLength(
+			arcStart,
+			maxMaxArcLength*float64(a.width),
+			radialStart,
+			stype,
+		)
 
 		arcEnd := math.Mod(arcStart+arcLength/180.0*math.Pi, 2*math.Pi)
 		radialEnd := radialStart + radialLength
 
-		annulus := Annulus{x: cx, y: cy, start: arcStart, end: arcEnd, inner: radialStart, outer: radialEnd}
+		annulus := Annulus{
+			x:     cx,
+			y:     cy,
+			start: arcStart,
+			end:   arcEnd,
+			inner: radialStart,
+			outer: radialEnd,
+		}
 
 		svg := annulus.SVG()
 		path := canvas.MustParseSVG(svg)
